@@ -18,4 +18,5 @@ def load_env():
     if Public_Instance == "1":
         env_vars['ALTERNATIVE_LINK'] = os.getenv('ALTERNATIVE_LINK')
     env_vars['ForwardProxy'] = os.getenv('FORWARDPROXY')
+    env_vars['FORCED_PORT'] = os.getenv('FORCED_PORT')
     return env_vars

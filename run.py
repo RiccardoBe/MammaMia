@@ -137,11 +137,11 @@ def manifest():
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
     forwarded_proto = request.headers.get("x-forwarded-proto", request.url.scheme)
-    forwarded_port = request.headers.get("x-forwarded-port")
     host = request.url.hostname
+    forced_port = env_vars.get('FORCED_PORT', '')
 
-    if forwarded_port and forwarded_port not in ("80", "443"):
-        instance_url = f"{forwarded_proto}://{host}:{forwarded_port}"
+    if forced_port not in ("80", "443"):
+        instance_url = f"{forwarded_proto}://{host}:{forced_port}"
     else:
         instance_url = f"{forwarded_proto}://{host}"
 

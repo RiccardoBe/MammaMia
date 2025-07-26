@@ -72,16 +72,23 @@ async def clone_m3u8(d: str = None):
 
 
 @router.api_route("/vixcloud/manifest.m3u8", methods=["GET", "HEAD"])
-async def clone2_m3u8(d:str,token:str,expires:str,h:str = None, b:str = None, request: Request = None):
+async def clone2_m3u8(d: str, token: str, expires: str, h: str = None, b: str = None, request: Request = None):
     try:
         m3u8 = f'{d}?token={token}&expires={expires}'
         if h:
-            m3u8 = m3u8 + f'&h={h}'
+            m3u8 += f'&h={h}'
         if b:
-            m3u8 = m3u8 + f'&b={b}'
-        forwarded_proto = request.headers.get("x-forwarded-proto")
-        scheme = forwarded_proto if forwarded_proto else request.url.scheme
-        instance_url = f"{scheme}://{request.url.netloc}"
+            m3u8 += f'&b={b}'
+
+        forwarded_proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+        host = request.url.hostname
+        forced_port = str(env_vars.get('FORCED_PORT', ""))
+
+        if forced_port and forced_port not in ("80", "443"):
+            instance_url = f"{forwarded_proto}://{host}:{forced_port}"
+        else:
+            instance_url = f"{forwarded_proto}://{host}"
+
         m3u8_content = await fetch_m3u8(m3u8)
         modified_playlist = m3u8_content.replace("https://vixcloud.co/playlist/", f"{instance_url}/clony/")
 
