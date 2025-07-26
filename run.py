@@ -134,11 +134,17 @@ def addon_manifest(config: str):
 def manifest():
     return RedirectResponse(url="/|SC|LC|SW|/manifest.json")
 
-@app.get('/', response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 def root(request: Request):
-    forwarded_proto = request.headers.get("x-forwarded-proto")
-    scheme = forwarded_proto if forwarded_proto else request.url.scheme
-    instance_url = f"{scheme}://{request.url.netloc}"
+    forwarded_proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    forwarded_port = request.headers.get("x-forwarded-port")
+    host = request.url.hostname
+
+    if forwarded_port and forwarded_port not in ("80", "443"):
+        instance_url = f"{forwarded_proto}://{host}:{forwarded_port}"
+    else:
+        instance_url = f"{forwarded_proto}://{host}"
+
     html_content = HTML.replace("{instance_url}", instance_url)
     return html_content
 async def addon_catalog(type: str, id: str, genre: str = None):
