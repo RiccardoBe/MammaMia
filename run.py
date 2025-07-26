@@ -138,7 +138,7 @@ def manifest():
 def root(request: Request):
     forwarded_proto = request.headers.get("x-forwarded-proto", request.url.scheme)
     host = request.url.hostname
-    forced_port = env_vars.get('FORCED_PORT', '')
+    forced_port = env_vars.get('FORCED_PORT', "80")
 
     if forced_port not in ("80", "443"):
         instance_url = f"{forwarded_proto}://{host}:{forced_port}"
